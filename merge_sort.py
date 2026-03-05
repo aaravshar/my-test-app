@@ -1,3 +1,4 @@
+```python
 def merge_sort(arr):
     """Sorts an array in ascending order using the merge sort algorithm."""
     if len(arr) <= 1:
@@ -33,3 +34,4 @@ def merge(left, right):
 if __name__ == "__main__":
     test_list = [38, 27, 43, 3, 9, 82, 10]
     print("Sorted array:", merge_sort(test_list))
+```
