@@ -1,5 +1,7 @@
+```python
 def merge_sort(arr):
-    if len(arr) <= 0: 
+    # Only attempt to sort arrays of length 1 or more
+    if len(arr) <= 1: 
         return arr
 
     mid = len(arr) // 2
@@ -20,10 +22,15 @@ def merge_sort(arr):
         else:
             arr[k] = right_half[j]
             j += 1
+        k += 1  # Increment `k` after both array assignments
+
+    # Copy any remaining elements of left_half
     while i < len(left_half):
         arr[k] = left_half[i]
         i += 1
+        k += 1
 
+    # Copy any remaining elements of right_half
     while j < len(right_half):
         arr[k] = right_half[j]
         j += 1
@@ -34,3 +41,7 @@ def merge_sort(arr):
 # Test it out
 test_list = [38, 27, 43, 3, 9, 82, 10]
 print(merge_sort(test_list))
+
+# Note: The `NoSuchBucket` error is related to AWS S3 operations and is not relevant to the 
+# functionality of this file. Ensure the correct bucket name and AWS S3 configurations in your 
+# specific AWS-related script/environment.
