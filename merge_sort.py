@@ -1,5 +1,5 @@
 def merge_sort(arr):
-    if len(arr) <= 1: 
+    if len(arr) <= 1:
         return arr
 
     mid = len(arr) // 2
@@ -34,6 +34,7 @@ def merge_sort(arr):
 
     return arr
 
-# Test it out
-test_list = [38, 27, 43, 3, 9, 82, 10]
-print(merge_sort(test_list))
+if __name__ == "__main__":
+    test_list = [38, 27, 43, 3, 9, 82, 10]
+    sorted_list = merge_sort(test_list)
+    print("Sorted list:", sorted_list)
