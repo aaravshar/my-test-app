@@ -1,3 +1,4 @@
+```javascript
 function mergeSort(arr) {
     // Base case: array is already sorted or with a single element
     if (arr.length <= 1) {
@@ -36,3 +37,4 @@ function merge(left, right) {
 // Example usage
 const testArray = [38, 27, 43, 3, 9, 82, 10];
 console.log("Sorted array:", mergeSort(testArray));
+```
