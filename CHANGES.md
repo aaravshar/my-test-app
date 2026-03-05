@@ -189,3 +189,110 @@ console.log("Sorted array:", mergeSort(testArray));
 If additional help is needed regarding the external error, check logs for details or involve the service provider's support team for further assistance.
 
 If this JavaScript file is what you intended by requesting changed files, apply it as necessary in your project structure. If you need any further modifications, let me know!
+
+## Turn 23
+
+Based on your description, it seems we need to focus on the external service error (`ValidationException`) you mentioned, which appears to relate to an AWS service or similar. However, for the sake of this exercise and focusing on your request, we'll update the JavaScript and Python implementations of the merge sort if needed, though it seems they are already well-optimized.
+
+### Steps to address feedback:
+1. **External Service Error**: This requires investigating the specific service or API that is being called. You should check the request and response logs to identify why the number of `toolResult` blocks exceeds `toolUse` blocks. Ensure that your service requests are correctly structured and match the expected API usage.
+
+2. **Code Cleanup**: Ensure all code across languages (JavaScript and Python) is clean, well-commented, and up to standard.
+
+Here's an overview of both implementations:
+
+### 1. JavaScript Implementation
+I'll make sure the JavaScript code is organized and well-commented:
+
+```javascript
+// FILE: path/to/merge_sort.js
+function mergeSort(arr) {
+    // Base case: single element arrays are already sorted
+    if (arr.length <= 1) {
+        return arr;
+    }
+
+    // Split array into two halves
+    const mid = Math.floor(arr.length / 2);
+    const leftHalf = arr.slice(0, mid);
+    const rightHalf = arr.slice(mid);
+
+    // Recursively sort both halves and merge them
+    return merge(mergeSort(leftHalf), mergeSort(rightHalf));
+}
+
+function merge(left, right) {
+    const result = [];
+    let i = 0;
+    let j = 0;
+
+    // Merge the sorted halves into a single sorted array
+    while (i < left.length && j < right.length) {
+        if (left[i] < right[j]) {
+            result.push(left[i]);
+            i++;
+        } else {
+            result.push(right[j]);
+            j++;
+        }
+    }
+
+    // Concatenate any remaining elements
+    return result.concat(left.slice(i)).concat(right.slice(j));
+}
+
+// Example usage
+const testArray = [38, 27, 43, 3, 9, 82, 10];
+console.log("Sorted array:", mergeSort(testArray));
+```
+This code should be placed in a file with the directory path `path/to/merge_sort.js`.
+
+### 2. Python Implementation
+Let's also ensure the Python code is correctly included and optimized:
+
+```python
+# FILE: path/to/merge_sort.py
+def merge_sort(arr):
+    """Sorts an array in ascending order using the merge sort algorithm."""
+    if len(arr) <= 1:
+        return arr
+
+    mid = len(arr) // 2
+    left_half = merge_sort(arr[:mid])
+    right_half = merge_sort(arr[mid:])
+
+    return merge(left_half, right_half)
+
+def merge(left, right):
+    """Merges two sorted sublists into a single sorted list."""
+    result = []
+    i = j = 0
+
+    # Merge process for combining two halves
+    while i < len(left) and j < len(right):
+        if left[i] < right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+
+    # Append remaining elements
+    result.extend(left[i:])
+    result.extend(right[j:])
+
+    return result
+
+# For testing the function 
+if __name__ == "__main__":
+    test_list = [38, 27, 43, 3, 9, 82, 10]
+    print("Sorted array:", merge_sort(test_list))
+```
+This code should be placed in a file with the directory path `path/to/merge_sort.py`.
+
+### Summary
+- **External Service Error Resolution**: Investigate the structure and logic of your API/service calls related to `toolResult` and `toolUse` blocks.
+- **Code Quality**: Ensure both JavaScript and Python implementations are structured well and commented adequately.
+- Ensure that your file path and file content in your project are correctly set. If you require further assistance with the external error, reviewing service logs or contacting the service provider's support team may help.
+
+If you have more specific questions about handling the external service error or need further changes implemented, please provide additional details.
