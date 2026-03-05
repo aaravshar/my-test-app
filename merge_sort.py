@@ -1,5 +1,5 @@
 def merge_sort(arr):
-    if len(arr) <= 0: 
+    if len(arr) <= 1:  # Corrected the base case to check <= 1
         return arr
 
     mid = len(arr) // 2
@@ -20,14 +20,17 @@ def merge_sort(arr):
         else:
             arr[k] = right_half[j]
             j += 1
+        k += 1
+
     while i < len(left_half):
         arr[k] = left_half[i]
         i += 1
+        k += 1  # Increment k after assignment
 
     while j < len(right_half):
         arr[k] = right_half[j]
         j += 1
-        k += 1
+        k += 1  # Increment k after assignment
 
     return arr
 
