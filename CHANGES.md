@@ -54,3 +54,90 @@ Here's a plan to streamline the test execution process:
 If any changes to the way the tests are executed are necessary, or if more detailed setup instructions are required, consider adding a README file or comments at the top of `test_merge_sort.py` explaining the setup and execution process.
 
 Since there are no issues detected with the existing setup and test code itself from your description, no code changes need to be made at this time. Therefore, no file outputs are necessary. If you re-run the build and encounter errors, please share the error details for further assistance.
+
+## Turn 13
+
+Based on the feedback, it seems that the main issue arises from an execution or setup problem rather than the actual code. However, it's always good to ensure everything is properly documented and the code is ready for a clean run. Here is an updated step-by-step guide and the required changes to ensure smooth testing and documentation. Let's add a little more clarity to the `README.md` and some instructions in `test_merge_sort.py`.
+
+### Updated Files
+
+I'll make sure the documentation and instructions are as clear as possible without altering the functioning code as per your current context.
+
+---
+
+#### Updated `README.md`
+
+```markdown
+# Merge Sort Implementation and Test Instructions
+
+This project contains a Python implementation of the Merge Sort algorithm and a corresponding set of unit tests to verify its functionality.
+
+## Files:
+
+- `merge_sort.py`: Contains the implementation of the Merge Sort algorithm.
+- `test_merge_sort.py`: Contains unit tests for the `merge_sort` function using Python's `unittest` framework.
+
+## Setup and Running Instructions
+
+To ensure that you can run the tests smoothly, please follow these instructions:
+
+1. **Ensure Python is Installed**: Make sure you have Python installed on your machine. Verify by running:
+   ```sh
+   python --version
+   ```
+   If Python is not installed, download and install it from [python.org](https://www.python.org/).
+
+2. **Navigate to the Project Directory**: Open your command-line interface and use the `cd` command to navigate to the directory containing `merge_sort.py` and `test_merge_sort.py`:
+   ```sh
+   cd path/to/your/directory
+   ```
+
+3. **Verify Unittest Library**: Confirm that the `unittest` library is available. It comes with standard Python installations, so no extra setup is typically required.
+
+4. **Run the Tests**: Execute the test suite using Python’s `unittest` module with the following command:
+   ```sh
+   python -m unittest test_merge_sort.py
+   ```
+
+## Troubleshooting
+
+- Ensure you're in the correct directory where the Python files are located.
+- Check your Python environment setup if you encounter errors when running the tests.
+- For persistent issues, provide the error message details for further diagnosis or assistance.
+```
+
+---
+
+#### Updated `test_merge_sort.py`
+
+```python
+import unittest
+from merge_sort import merge_sort
+
+class TestMergeSort(unittest.TestCase):
+
+    def test_empty_list(self):
+        """ Test sorting an empty list """
+        self.assertEqual(merge_sort([]), [])
+
+    def test_single_element(self):
+        """ Test sorting a list with a single element """
+        self.assertEqual(merge_sort([1]), [1])
+
+    def test_sorted_list(self):
+        """ Test sorting an already sorted list """
+        self.assertEqual(merge_sort([1, 2, 3, 4, 5]), [1, 2, 3, 4, 5])
+
+    def test_unsorted_list(self):
+        """ Test sorting an unsorted list """
+        self.assertEqual(merge_sort([38, 27, 43, 3, 9, 82, 10]), [3, 9, 10, 27, 38, 43, 82])
+
+    def test_reverse_sorted_list(self):
+        """ Test sorting a reverse sorted list """
+        self.assertEqual(merge_sort([5, 4, 3, 2, 1]), [1, 2, 3, 4, 5])
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+The changes mainly enhance documentation clarity and provide better opportunities for understanding and executing test scripts. No functional code changes were necessary. With these updates, running and understanding the tests should be more straightforward. If issues persist at runtime, check to ensure any build errors have been corrected, and confirm that your test environment is correctly configured.
