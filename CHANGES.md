@@ -290,3 +290,73 @@ For additional guidance, please refer to the comments within `test_merge_sort.py
 This updated README file now includes a suggestion to re-run the build and check the logs for specific errors that need to be addressed, which aligns with the feedback provided about the build failure before the tests ran. 
 
 Ensure that the code files (`merge_sort.py` and `test_merge_sort.py`) are correctly defined without syntax or typing errors as well. If any specific issues with the code are discovered, they should be addressed directly in the respective files.
+
+## Turn 21
+
+It seems the issue at hand is related to the test execution possibly failing before the tests themselves could run. Given the provided files and feedback, it’s necessary to ensure the build and test execution environment is functioning correctly. Below are potential issues along with suggested corrections.
+
+Here are the steps and improvements:
+
+1. **Ensure Proper Use of `if __name__ == "__main__"` Block:**
+
+   In the `merge_sort.py` file, remove the code under the `# Test it out` as it may interfere with the module import, which is crucial when executing unit tests from `test_merge_sort.py`.
+
+2. **Check Python Environment and Path:**
+
+   Make sure your current directory is correct and that your Python environment is properly configured to include paths to the required modules.
+
+Here's the updated content for `merge_sort.py`:
+
+```python
+def merge_sort(arr):
+    if len(arr) <= 1: 
+        return arr
+
+    mid = len(arr) // 2
+    left_half = arr[:mid]
+    right_half = arr[mid:]
+
+    # Recursive calls
+    left_half = merge_sort(left_half)
+    right_half = merge_sort(right_half)
+
+    # Merge process
+    i = j = k = 0
+
+    while i < len(left_half) and j < len(right_half):
+        if left_half[i] <= right_half[j]:
+            arr[k] = left_half[i]
+            i += 1
+        else:
+            arr[k] = right_half[j]
+            j += 1
+        k += 1
+
+    while i < len(left_half):
+        arr[k] = left_half[i]
+        i += 1
+        k += 1
+
+    while j < len(right_half):
+        arr[k] = right_half[j]
+        j += 1
+        k += 1
+
+    return arr
+```
+
+Please remove the immediate test print at the end of this file if it was causing issues:
+
+```python
+# Test it out - REMOVE THIS UNIT TESTING USE `test_merge_sort.py`
+# test_list = [38, 27, 43, 3, 9, 82, 10]
+# print(merge_sort(test_list))
+```
+
+Finally, run the tests again using the command given in `README.md`:
+
+```sh
+python -m unittest test_merge_sort.py
+```
+
+If this doesn’t resolve the problem, look for any additional error messages that could give insights into underlying issues related to test discovery paths or module imports. Ensure that the error logs are documented when seeking further assistance.
