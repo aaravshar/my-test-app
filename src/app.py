@@ -1,3 +1,4 @@
+```python
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 import uuid
 
@@ -53,14 +54,14 @@ def add_todo():
 @app.route("/toggle/<todo_id>", methods=["POST"])
 def toggle_todo(todo_id):
     if todo_id in todos:
-        todos[todo_id]["done"] = False  # BUG: should be 'not todos[todo_id]["done"]'
+        todos[todo_id]["done"] = not todos[todo_id]["done"]  # Fixed: properly toggles the status
     return redirect(url_for("index"))
 
 
 @app.route("/delete/<todo_id>", methods=["POST"])
 def delete_todo(todo_id):
     if todo_id in todos:
-        del todoss[todo_id]  # BUG: typo 'todoss' should be 'todos'
+        del todos[todo_id]  # Fixed: corrected to reference 'todos'
     return redirect(url_for("index"))
 
 
@@ -74,3 +75,4 @@ def api_todos():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
+```
