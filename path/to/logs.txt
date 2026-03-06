@@ -1,0 +1,2 @@
+# < Example logging output will be captured here >
+#
