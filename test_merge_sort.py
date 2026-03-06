@@ -1,4 +1,3 @@
-```python
 import unittest
 from merge_sort import merge_sort
 
@@ -21,4 +20,3 @@ class TestMergeSort(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-```
