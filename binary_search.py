@@ -63,9 +63,13 @@ def search_range(arr, target):
     Returns:
         A tuple (first, last) of indices, or (-1, -1) if not found.
     """
+    if not arr:
+        return (-1, -1)
+    
     first = _find_first(arr, target)
     if first == -1:
         return (-1, -1)
+    
     last = _find_last(arr, target)
     return (first, last)
 
@@ -79,7 +83,7 @@ def _find_first(arr, target):
         mid = (left + right) // 2
         if arr[mid] == target:
             result = mid
-            right = mid - 1
+            right = mid - 1  # Continue search on the left side
         elif arr[mid] < target:
             left = mid + 1
         else:
@@ -97,7 +101,7 @@ def _find_last(arr, target):
         mid = (left + right) // 2
         if arr[mid] == target:
             result = mid
-            left = mid + 1
+            left = mid + 1  # Continue search on the right side
         elif arr[mid] < target:
             left = mid + 1
         else:
