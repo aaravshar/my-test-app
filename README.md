@@ -9,7 +9,7 @@ This project includes a linear search implementation and unit tests to verify it
 To ensure everything is working fine, you can run the tests using the following command:
 
 ```bash
-python -m unittest discover
+python -m unittest discover . "test*.py"
 ```
 
 This will automatically discover and run all unittests in files named `test*.py`.
