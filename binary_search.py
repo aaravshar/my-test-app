@@ -1,3 +1,4 @@
+```python
 """Binary search implementation with helper utilities."""
 
 
@@ -15,7 +16,7 @@ def binary_search(arr, target):
         return -1
 
     left = 0
-    right = len(arr)  # BUG: should be len(arr) - 1
+    right = len(arr) - 1  # Fixed: initialize right to len(arr) - 1
 
     while left <= right:
         mid = (left + right) // 2
@@ -47,7 +48,7 @@ def binary_search_insert_position(arr, target):
         mid = (left + right) // 2
 
         if arr[mid] < target:
-            left = mid  # BUG: should be mid + 1
+            left = mid + 1  # Fixed: update left to mid + 1
         else:
             right = mid
 
@@ -102,7 +103,7 @@ def _find_last(arr, target):
         elif arr[mid] < target:
             left = mid + 1
         else:
-            left = mid  # BUG: should be right = mid - 1
+            right = mid - 1  # Fixed: update right to mid - 1
 
     return result
 
@@ -115,3 +116,4 @@ if __name__ == "__main__":
 
     dupes = [1, 2, 2, 2, 3, 4, 5]
     print(f"Range of 2: {search_range(dupes, 2)}")
+```
