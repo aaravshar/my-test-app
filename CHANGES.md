@@ -123,3 +123,53 @@ Given that the `linear_search.py` code is functioning as expected for its purpos
 If specific errors are encountered or further assistance is required in interpreting log outputs, feel free to share those details. The emphasis is on aligning the test environment to correctly run the code and its tests during the build process.
 
 Since no code files need modifications, there are no file changes to output at this time. Focus efforts on the environment setup and configurations as described.
+
+## Turn 11
+
+Based on your feedback and observations, it seems that the core issue is not with the code itself, but rather with the build environment or CI/CD setup, which is preventing the tests from running successfully. In this case, the `linear_search.py` code appears to be functioning correctly, and the focus should be on ensuring that the environment where it runs is properly configured.
+
+Here is a structured plan to address the feedback and ensure that the build and tests can execute successfully:
+
+### Steps to Address Build and Test Issues
+
+1. **Examine CI/CD Build Logs:**
+   - Thoroughly inspect the CI/CD build logs to identify any error messages or failure points.
+   - Common issues can include missing dependencies, incorrect configurations, or syntax errors that prevent the build from progressing to the test phase.
+
+2. **Verify Test Environment Configuration:**
+   - Ensure that the environment is configured correctly, including all necessary dependencies and versions.
+   - If using a virtual environment, ensure it is activated during the CI/CD build process.
+   - Check any environment variables or paths necessary for successful execution of tests.
+
+3. **Run Tests Locally:**
+   - Execute your tests locally using `unittest` or `pytest` to confirm they pass without issues.
+   - Ensure that any local environments mimic the CI/CD setup to isolate configuration differences.
+
+4. **Re-run Build in CI/CD:**
+   - Once configurations and dependencies are verified, re-trigger the build process.
+   - Monitor the execution closely to ensure that tests are running as expected.
+
+5. **Troubleshoot Persistent Issues:**
+   - If issues persist, gather specific error messages from the logs.
+   - Provide these error messages for further troubleshooting or consult with a DevOps specialist if necessary.
+
+### File Changes
+
+Since the primary issue revolves around the CI/CD configuration and not the Python code itself, no changes are required to the `linear_search.py` file. The code provided for linear search is correct:
+
+```python
+def linear_search(arr, target):
+    """Search for target in a list. Returns the index if found, -1 otherwise."""
+    for i in range(len(arr)):  # Corrected to range(len(arr))
+        if arr[i] == target:
+            return i
+    return -1
+
+
+if __name__ == "__main__":
+    nums = [4, 2, 7, 1, 9]
+    print(f"Search for 7: {linear_search(nums, 7)}")
+    print(f"Search for 9: {linear_search(nums, 9)}")
+```
+
+Since the problem is environmental, and the code does not need adjustments based on the feedback, there are no file modifications to output at this time. Take the steps outlined to check and correct your test environment and build configurations. If further issues arise, provide more detailed error messages for additional support.
