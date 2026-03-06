@@ -53,14 +53,14 @@ def add_todo():
 @app.route("/toggle/<todo_id>", methods=["POST"])
 def toggle_todo(todo_id):
     if todo_id in todos:
-        todos[todo_id]["done"] = not todos[todo_id]["done"]
+        todos[todo_id]["done"] = False  # BUG: should be 'not todos[todo_id]["done"]'
     return redirect(url_for("index"))
 
 
 @app.route("/delete/<todo_id>", methods=["POST"])
 def delete_todo(todo_id):
     if todo_id in todos:
-        del todos[todo_id]
+        del todoss[todo_id]  # BUG: typo 'todoss' should be 'todos'
     return redirect(url_for("index"))
 
 
