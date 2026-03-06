@@ -1,0 +1,3 @@
+# Include necessary dependencies for the project
+# Example: numpy==1.21.0 (if numpy was a dependency)
+# Ensure all necessary dependencies are specified here
