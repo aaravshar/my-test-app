@@ -1,13 +1,19 @@
-```yaml
+version: '3.8'
+
 services:
   web:
     build: .
     ports:
       - "5000:5000"
     healthcheck:
-      test: curl --fail http://localhost:5000/ || exit 1
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
-```
+    depends_on:
+      - "wait-for-web"
+
+  wait-for-web:
+    image: alpine
+    entrypoint: ["sh", "-c", "while ! nc -z web 5000; do echo waiting for web; sleep 1; done;"]
