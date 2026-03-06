@@ -15,7 +15,7 @@ def binary_search(arr, target):
         return -1
 
     left = 0
-    right = len(arr)  # BUG: should be len(arr) - 1
+    right = len(arr) - 1  # FIX: use len(arr) - 1
 
     while left <= right:
         mid = (left + right) // 2
@@ -47,7 +47,7 @@ def binary_search_insert_position(arr, target):
         mid = (left + right) // 2
 
         if arr[mid] < target:
-            left = mid  # BUG: should be mid + 1
+            left = mid + 1  # FIX: use mid + 1
         else:
             right = mid
 
@@ -102,7 +102,7 @@ def _find_last(arr, target):
         elif arr[mid] < target:
             left = mid + 1
         else:
-            left = mid  # BUG: should be right = mid - 1
+            right = mid - 1  # FIX: change to right = mid - 1
 
     return result
 
