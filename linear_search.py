@@ -1,6 +1,6 @@
 def linear_search(arr, target):
     """Search for target in a list. Returns the index if found, -1 otherwise."""
-    for i in range(len(arr) - 1):  # BUG: should be range(len(arr))
+    for i in range(len(arr)):  # Fixed the range to include the last element
         if arr[i] == target:
             return i
     return -1
