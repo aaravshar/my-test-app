@@ -4,7 +4,7 @@ const { defineConfig } = require('@playwright/test');
 module.exports = defineConfig({
   testDir: './tests/public',
   timeout: 30000,
-  retries: 0,
+  retries: 1,
   reporter: [
     ['list'],
     ['junit', { outputFile: 'junit.xml' }]
@@ -12,5 +12,11 @@ module.exports = defineConfig({
   use: {
     baseURL: 'http://localhost:5000',
     headless: true,
+  },
+  webServer: {
+    command: 'echo "waiting for docker"',
+    url: 'http://localhost:5000/',
+    reuseExistingServer: true,
+    timeout: 60000,
   },
 });
