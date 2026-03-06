@@ -1,5 +1,3 @@
-// Improved handling of toolResult and toolUse associations in the conversation flow
-
 function handleConversationStep(toolUseId, message) {
     try {
         let toolResultBlocks = trackToolResults(toolUseId);
@@ -7,10 +5,12 @@ function handleConversationStep(toolUseId, message) {
         const expectedBlockCount = expectedBlocks(toolUseId);
 
         if (toolResultBlocks.length > expectedBlockCount) {
-            throw new Error(`Tool result blocks (${toolResultBlocks.length}) exceed expected usage (${expectedBlockCount}) for ${toolUseId}`);
+            console.warn(`Tool result blocks (${toolResultBlocks.length}) exceed expected usage (${expectedBlockCount}) for ${toolUseId}`);
+            // Adjust to match the expected block count by truncating the excess blocks if required
+            toolResultBlocks = toolResultBlocks.slice(0, expectedBlockCount);
         }
 
-        // Proceed with processing of message and results if the counts match expectations
+        // Proceed with processing of message and results if the counts are now in sync
         processMessageWithResults(toolUseId, message, toolResultBlocks);
     } catch (error) {
         console.error('Error processing conversation step:', error);
