@@ -1,16 +1,20 @@
-```javascript
 function handleToolUse(request) {
     logUse(request); // Logging to ensure toolUse is captured
 
     // Perform the action based on the tool use request
-    const response = performAction(request);
-
-    // Log the result of the action, even if it fails
-    if (response.success) {
-        logResult(response); // Logging the corresponding toolResult for success
-    } else {
+    let response;
+    try {
+        response = performAction(request);
+    } catch (error) {
+        response = { success: false, error: error.message || "Unknown error" };
+    }
+    
+    // Log the result of the action, regardless of success or failure
+    logResult(response);
+    
+    // Handle failure if any
+    if (!response.success) {
         logError("Action failed.");
-        logResult({ success: false, error: response.error || "Unknown error" }); // Ensure toolResult is logged on failure
         handleFailure(response);
     }
 }
@@ -30,12 +34,8 @@ function logResult(result) {
 // Example of performing the action requested by the tool use
 function performAction(request) {
     // Perform some operations, resulting in a success or error response
-    try {
-        // Simulate action with potential success outcome
-        return { success: true, data: "Action result data" };
-    } catch (error) {
-        return { success: false, error: error.message };
-    }
+    // Simulate action with potential success outcome
+    return { success: true, data: "Action result data" };
 }
 
 // Placeholder for handling failures
@@ -43,4 +43,8 @@ function handleFailure(response) {
     console.error("Handling failure:", response);
     // Implementation for handling errors based on response...
 }
-```
+
+// Example function for logging errors
+function logError(message) {
+    console.error(message);
+}
