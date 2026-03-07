@@ -10,7 +10,7 @@ todos = {}
 @app.route("/")
 def index():
     filter_status = request.args.get("filter", "all")
-    search_query = request.args.get("q", "").strip().lower()
+    search_query = request.args.get("q", "").strip()  # BUG: missing .lower(), search is case-sensitive
 
     filtered = []
     for tid, todo in sorted(todos.items(), key=lambda x: x[1]["created"], reverse=True):
