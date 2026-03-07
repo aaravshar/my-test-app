@@ -1,3 +1,4 @@
+```python
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 import uuid
 
@@ -10,7 +11,7 @@ todos = {}
 @app.route("/")
 def index():
     filter_status = request.args.get("filter", "all")
-    search_query = request.args.get("q", "").strip()  # BUG: missing .lower(), search is case-sensitive
+    search_query = request.args.get("q", "").strip().lower()  # Convert search query to lowercase
 
     filtered = []
     for tid, todo in sorted(todos.items(), key=lambda x: x[1]["created"], reverse=True):
@@ -18,7 +19,7 @@ def index():
             continue
         if filter_status == "completed" and not todo["done"]:
             continue
-        if search_query and search_query not in todo["title"].lower():
+        if search_query and search_query not in todo["title"].lower():  # Compare with lowercased todo title
             continue
         filtered.append({"id": tid, **todo})
 
@@ -74,3 +75,4 @@ def api_todos():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
+```
