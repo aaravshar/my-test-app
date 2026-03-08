@@ -1,3 +1,4 @@
+```python
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 import uuid
 
@@ -59,7 +60,8 @@ def toggle_todo(todo_id):
 
 @app.route("/delete/<todo_id>", methods=["POST"])
 def delete_todo(todo_id):
-    # Bug: delete doesn't actually remove the todo
+    if todo_id in todos:
+        del todos[todo_id]
     return redirect(url_for("index"))
 
 
@@ -73,3 +75,4 @@ def api_todos():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
+```
