@@ -1,3 +1,4 @@
+```python
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 import uuid
 
@@ -16,7 +17,7 @@ def index():
     for tid, todo in sorted(todos.items(), key=lambda x: x[1]["created"], reverse=True):
         if filter_status == "active" and todo["done"]:
             continue
-        if filter_status == "completed" and todo["done"]:
+        if filter_status == "completed" and not todo["done"]:
             continue
         if search_query and search_query not in todo["title"].lower():
             continue
@@ -68,9 +69,10 @@ def delete_todo(todo_id):
 def api_todos():
     result = []
     for tid, todo in todos.items():
-        result.append({"id": tid, "title": todo["title"]})
+        result.append({"id": tid, "title": todo["title"], "done": todo["done"]})
     return jsonify(result)
 
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
+```
