@@ -16,7 +16,7 @@ def index():
     for tid, todo in sorted(todos.items(), key=lambda x: x[1]["created"], reverse=True):
         if filter_status == "active" and todo["done"]:
             continue
-        if filter_status == "completed" and not todo["done"]:
+        if filter_status == "completed" and todo["done"]:
             continue
         if search_query and search_query not in todo["title"].lower():
             continue
@@ -68,7 +68,7 @@ def delete_todo(todo_id):
 def api_todos():
     result = []
     for tid, todo in todos.items():
-        result.append({"id": tid, **todo})
+        result.append({"id": tid, "title": todo["title"]})
     return jsonify(result)
 
 
