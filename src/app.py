@@ -26,7 +26,7 @@ def get_current_user():
         username = session['username']
         if username in users:
             return username
-    # Check API key header (Flask headers are case-insensitive)
+    # Check API key header
     api_key = request.headers.get('X-Api-Key')
     if api_key:
         try:
