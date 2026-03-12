@@ -23,11 +23,12 @@ def get_current_user():
     """Get the current authenticated user from session or API key."""
     # Check session first
     if 'username' in session:
-        return session['username']
-    # Check API key header
-    api_key = request.headers.get('x-api-key') or request.headers.get('X-Api-Key')
+        username = session['username']
+        if username in users:
+            return username
+    # Check API key header (Flask headers are case-insensitive)
+    api_key = request.headers.get('X-Api-Key')
     if api_key:
-        # O(1) lookup: decode the API key to get the username directly
         try:
             decoded_username = base64.b64decode(api_key.encode('utf-8')).decode('utf-8')
             if decoded_username in users:
@@ -56,7 +57,7 @@ def login_required(f):
 def login():
     if request.method == "GET":
         # If already logged in, redirect to index
-        if 'username' in session:
+        if 'username' in session and session['username'] in users:
             return redirect(url_for('index'))
         return render_template("login.html", error=None)
 
@@ -73,7 +74,7 @@ def login():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "GET":
-        if 'username' in session:
+        if 'username' in session and session['username'] in users:
             return redirect(url_for('index'))
         return render_template("register.html", error=None)
 
