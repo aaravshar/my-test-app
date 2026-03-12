@@ -20,13 +20,22 @@ def get_api_key_for_username(username):
 
 
 def get_current_user():
-    """Get the current authenticated user from session or API key."""
+    """Get the current authenticated user from session or API key.
+
+    1. First checks if 'username' exists in the Flask session and that
+       the username corresponds to a registered user.
+    2. If no valid session, falls back to checking the X-Api-Key header.
+       The API key is a base64-encoded username; if it decodes to a
+       registered username, that user is returned.
+    3. Returns None if neither method yields a valid user.
+    """
     # Check session first
     if 'username' in session:
         username = session['username']
         if username in users:
             return username
-    # Check API key header
+
+    # Check API key header as fallback
     api_key = request.headers.get('X-Api-Key')
     if api_key:
         try:
@@ -35,18 +44,25 @@ def get_current_user():
                 return decoded_username
         except Exception:
             pass
+
     return None
 
 
 def login_required(f):
-    """Decorator to require authentication for a route."""
+    """Decorator to require authentication for a route.
+
+    For API endpoints (paths starting with /api/), returns a 401 JSON error.
+    For browser endpoints, redirects unauthenticated users to /login.
+    Sets g.username to the authenticated username for the wrapped function.
+    """
     @functools.wraps(f)
     def decorated_function(*args, **kwargs):
         user = get_current_user()
         if user is None:
-            # For API endpoints, return 401
+            # For API endpoints, return 401 JSON response
             if request.path.startswith('/api/'):
                 return jsonify({"error": "Authentication required"}), 401
+            # For browser endpoints, redirect to login page
             return redirect(url_for('login'))
         g.username = user
         return f(*args, **kwargs)
@@ -61,6 +77,7 @@ def login():
             return redirect(url_for('index'))
         return render_template("login.html", error=None)
 
+    # POST: validate credentials and set session
     username = request.form.get("username", "").strip()
     password = request.form.get("password", "").strip()
 
@@ -78,6 +95,7 @@ def register():
             return redirect(url_for('index'))
         return render_template("register.html", error=None)
 
+    # POST: create new user with hashed password
     username = request.form.get("username", "").strip()
     password = request.form.get("password", "").strip()
 
@@ -87,18 +105,21 @@ def register():
     if username in users:
         return render_template("register.html", error="Username already exists")
 
+    # Store user with hashed password and generated API key
     api_key = get_api_key_for_username(username)
     users[username] = {
         "password_hash": generate_password_hash(password),
         "api_key": api_key,
     }
+    # Initialize empty todo dict for this user
     user_todos[username] = {}
 
     return redirect(url_for('login'))
 
 
-@app.route("/logout", methods=["POST"])
+@app.route("/logout", methods=["GET", "POST"])
 def logout():
+    """Clear the session and redirect to the login page."""
     session.pop('username', None)
     return redirect(url_for('login'))
 
