@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Todo App</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 80px auto; padding: 0 20px; }
+        h1 { text-align: center; }
+        .login-form { display: flex; flex-direction: column; gap: 12px; }
+        .login-form input { padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; }
+        .login-form button { padding: 10px; font-size: 16px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+        .login-form button:hover { background: #0056b3; }
+        .error { color: #dc3545; text-align: center; margin-bottom: 12px; padding: 8px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; }
+        .register-link { text-align: center; margin-top: 16px; }
+        .register-link a { color: #007bff; }
+    </style>
+</head>
+<body>
+    <h1>Login</h1>
+
+    {% if error %}
+    <div class="error" data-testid="login-error">{{ error }}</div>
+    {% endif %}
+
+    <form class="login-form" action="/login" method="POST" data-testid="login-form">
+        <input type="text" name="username" placeholder="Username" data-testid="username-input" required>
+        <input type="password" name="password" placeholder="Password" data-testid="password-input" required>
+        <button type="submit" data-testid="login-button">Login</button>
+    </form>
+
+    <div class="register-link">
+        <p>Don't have an account? <a href="/register">Register here</a></p>
+    </div>
+</body>
+</html>
