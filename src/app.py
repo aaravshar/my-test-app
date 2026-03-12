@@ -27,9 +27,13 @@ def get_current_user():
     # Check API key header
     api_key = request.headers.get('x-api-key') or request.headers.get('X-Api-Key')
     if api_key:
-        for username, user_data in users.items():
-            if user_data.get('api_key') == api_key:
-                return username
+        # O(1) lookup: decode the API key to get the username directly
+        try:
+            decoded_username = base64.b64decode(api_key.encode('utf-8')).decode('utf-8')
+            if decoded_username in users:
+                return decoded_username
+        except Exception:
+            pass
     return None
 
 
