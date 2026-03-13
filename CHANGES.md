@@ -402,3 +402,97 @@ If you still face the issue after these changes, make sure:
 - The key structure `{ 'id': todo_id }` should match exactly how items are stored in DynamoDB, both in terms of key names and types.
 
 You can test your changes by deploying your application, observing the console output for the DynamoDB interactions, and ensuring to correct any configurations as needed.
+
+## Turn 25
+
+The error you're encountering, `ResourceNotFoundException`, when calling the `GetItem` operation typically indicates that either the table doesn't exist, the specified key is incorrect, or there are permissions issues with your AWS setup. Here’s how we can update your code and Docker configurations to help address this issue:
+
+### Steps to Address the Error:
+
+1. **Check DynamoDB Table and Key:**
+   - Ensure that the DynamoDB table `TodosTable` exists in the `us-west-2` region or whichever region you're using.
+   - Verify the primary key structure for your table. The key you're using should match the key schema of your DynamoDB table.
+
+2. **Add AWS Configuration:**
+   - Ensure your application has appropriate AWS credentials. This can be done by configuring AWS credentials using the AWS CLI or setting environment variables like `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+
+3. **Docker Configuration:**
+   - Configuring the Docker container to have access to the necessary AWS credentials.
+
+Below, I’ll detail updates to the application and Docker configuration files:
+
+### Updated Files
+
+#### `src/dynamodb_operations.py` Update
+We should add logs to get more details about the error that occurs:
+
+```python
+import boto3
+from botocore.exceptions import ClientError
+
+def get_dynamodb_client():
+    return boto3.resource('dynamodb', region_name='us-west-2')  # Change region as needed
+
+def get_item_from_dynamodb(table_name, key):
+    try:
+        table = get_dynamodb_client().Table(table_name)
+        response = table.get_item(Key=key)
+        return response.get('Item')
+    except ClientError as e:
+        # Log the error details
+        print(f"Error fetching item from DynamoDB: {e.response['Error']['Message']}")
+        if e.response['Error']['Code'] == 'ResourceNotFoundException':
+            print("Table or item not found. Please check your table name and key.")
+        return None
+```
+
+#### `src/Dockerfile` Update
+To handle AWS credentials within Docker:
+
+```Dockerfile
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 5000
+
+# Assuming the credentials are available as environment variables
+ENV AWS_ACCESS_KEY_ID=""
+ENV AWS_SECRET_ACCESS_KEY=""
+
+CMD ["python", "app.py"]
+```
+
+#### `src/docker-compose.yml` Update
+Ensure AWS credentials are passed as environment variables in the docker-compose file:
+
+```yaml
+version: '3.8'
+services:
+  web:
+    build:
+      context: ./src
+    ports:
+      - "5000:5000"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-west-2}
+```
+
+### Environment Configuration
+Ensure you have the AWS credentials on your local system or CI/CD pipeline, where you execute `docker-compose up`:
+
+1. Make sure AWS credentials are configured in your environment.
+2. Check with AWS CLI:
+   ```sh
+   aws configure
+   ```
+   Use this command to set up the default AWS Access Key, Secret Access Key, and region.
+
+By making these adjustments, you will specify the AWS authentication details and provide the correct table details, which can resolve the `ResourceNotFoundException` error.
