@@ -23,11 +23,11 @@ module.exports = defineConfig({
   metadata: {
     task: {
       test_case_config: {
-        // Customize the settings below according to your project
         exampleSetting: true,         // Example: Determines if a feature is enabled
         timeoutMultiplier: 2,         // Example: Adjusts the global timeout settings
-        additionalConfig: 'value',    // Another example setting for further customization
+        additionalConfig: 'specific-value',    // Customize this field as necessary
       }
     }
   }
 });
+```
