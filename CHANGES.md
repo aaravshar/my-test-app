@@ -156,3 +156,93 @@ if __name__ == "__main__":
 - **Region Configuration:** Check the region in which the DynamoDB table is created matches the `region_name` configured in the DynamoDB client setup.
 
 This setup should help to track down and handle `ResourceNotFoundException` effectively while interacting with DynamoDB in the Python script provided.
+
+## Turn 13
+
+To address the `ResourceNotFoundException` error in the context of a DynamoDB integration, we've made some updates to address the feedback effectively. Here’s a detailed walkthrough of the changes, particularly focusing on `dynamodb_operations.py` and the `requirements.txt` file.
+
+### Changes Made:
+
+1. **Enhanced Error Handling in `dynamodb_operations.py`:** Improved the error handling by adding comprehensive log messages and structured exception management to handle DynamoDB connection and query issues.
+
+2. **AWS SDK Addition:** Added `boto3` to the `requirements.txt` file to ensure the AWS SDK is available for interacting with Amazon Web Services.
+
+3. **Updated `dynamodb_operations.py`:** Ensured all operations with DynamoDB handle potential exceptions gracefully, providing more informative error messages.
+
+### Modified Files:
+
+#### `requirements.txt`
+
+We include `boto3` to facilitate interaction with DynamoDB through AWS SDK.
+
+```plaintext
+flask==2.3.2
+boto3==1.24.0
+```
+
+#### `src/dynamodb_operations.py`
+
+Enhanced the handling of DynamoDB interactions. Here's the updated code:
+
+```python
+import boto3
+from botocore.exceptions import ClientError
+
+def initialize_dynamodb_client(region_name='us-west-2'):
+    """
+    Initializes and returns a DynamoDB client with the specified region.
+    """
+    return boto3.resource('dynamodb', region_name=region_name)
+
+def get_item_from_dynamodb(table_name, key, dynamodb_client=None):
+    """
+    Retrieves an item from the specified DynamoDB table.
+    Args:
+        table_name (str): The name of the table to query.
+        key (dict): The key of the item to retrieve.
+        dynamodb_client: The DynamoDB client to use for the request.
+    Returns:
+        dict: The item from the DynamoDB table, or None if not found.
+    """
+    try:
+        if dynamodb_client is None:
+            dynamodb_client = initialize_dynamodb_client()
+
+        table = dynamodb_client.Table(table_name)
+        response = table.get_item(Key=key)
+
+        if 'Item' in response:
+            return response['Item']
+        else:
+            print(f"No item found for key: {key}")
+            return None
+
+    except ClientError as e:
+        error_code = e.response['Error']['Code']
+        if error_code == 'ResourceNotFoundException':
+            print(f"Error: Requested DynamoDB table '{table_name}' not found. Check if the table exists and is in the correct region.")
+        elif error_code == 'ValidationException':
+            print(f"Validation error with key: {key}. Check if key structure is correct.")
+        else:
+            print(f"Unexpected error: {e}")
+        return None
+
+# Example usage
+if __name__ == "__main__":
+    table_name = "example_table"
+    key = {"id": "example_id"}
+
+    item = get_item_from_dynamodb(table_name, key)
+    if item:
+        print("Item retrieved:", item)
+    else:
+        print("Failed to retrieve item.")
+```
+
+### Additional Recommendations:
+
+- **Check Table Existence and Region:** Ensure the `example_table` exists in the specified AWS region.
+- **Manage Configuration Securely:** Use environment variables or an AWS configuration file to manage credentials and set them up securely.
+- **IAM Role Permissions:** Make sure that the IAM role being used has the necessary permissions to perform operations on the DynamoDB table.
+
+These modifications will help handle potential issues related to DynamoDB interactions and provide more robust error reporting and handling mechanisms.
