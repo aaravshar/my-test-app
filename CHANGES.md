@@ -348,3 +348,57 @@ boto3==1.28.8
 ```
 
 Remember, you need AWS credentials with permissions to interact with DynamoDB for this code to work. Adjust the above solutions depending on your exact implementation details.
+
+## Turn 23
+
+To address the error regarding the ResourceNotFoundException when calling the GetItem operation in the DynamoDB integration, you need to ensure that the table name and any sort of required configuration settings match your AWS DynamoDB setup.
+
+Below are the areas you may need to update or verify in your existing code:
+
+1. **DynamoDB Configuration**: Ensure the table name, key structure, and region settings match your AWS DynamoDB configuration.
+
+2. **Error Handling Improvements**: Enhance error messaging for easier debugging.
+
+Let's proceed with the changes:
+
+### Changes to `src/dynamodb_operations.py`
+
+We'll add improved logging to better diagnose what might be going wrong with the DynamoDB calls.
+
+```python
+import boto3
+from botocore.exceptions import ClientError
+
+def get_dynamodb_client():
+    return boto3.resource('dynamodb', region_name='us-west-2')  # Ensure this region matches your AWS setup
+
+def get_item_from_dynamodb(table_name, key):
+    try:
+        print(f"Attempting to fetch item: {key} from table: {table_name}")
+        table = get_dynamodb_client().Table(table_name)
+        response = table.get_item(Key=key)
+        if 'Item' in response:
+            return response['Item']
+        else:
+            print(f"Item not found: {key}")
+            return None
+    except ClientError as e:
+        print(f"Error fetching item from DynamoDB. Table: {table_name}, Key: {key}, Error: {e}")
+        return None
+```
+
+### Explanation
+
+- **Region and Table Name**: Check and ensure that the `region_name` in `boto3.resource` matches the region where your DynamoDB table is deployed. Similarly, ensure `table_name` matches exactly with your DynamoDB table name.
+
+- **Improved Logging**: Additional `print` statements are added to log attempts, successes, and errors clearly. This will help you trace if your request is reaching DynamoDB and how it's being handled.
+
+- **Error Print Message**: The error message for item retrieval includes table and key details, which could help identify if the setup or the data is the issue.
+
+If you still face the issue after these changes, make sure:
+
+- You have the correct permissions set in your AWS IAM roles for accessing DynamoDB.
+- Your AWS credentials are properly configured in the environment where you're running this code.
+- The key structure `{ 'id': todo_id }` should match exactly how items are stored in DynamoDB, both in terms of key names and types.
+
+You can test your changes by deploying your application, observing the console output for the DynamoDB interactions, and ensuring to correct any configurations as needed.
