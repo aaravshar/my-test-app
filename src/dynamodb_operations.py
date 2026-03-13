@@ -11,6 +11,10 @@ def get_item_from_dynamodb(table_name, key):
         response = table.get_item(Key=key)
         return response.get('Item')
     except ClientError as e:
-        print(f"Error fetching item: {e}")
+        error_code = e.response['Error']['Code']
+        if error_code == 'ResourceNotFoundException':
+            print(f"Table {table_name} or item with key {key} not found.")
+        else:
+            print(f"Error fetching item: {e.response['Error']['Message']}")
         return None
 ```
