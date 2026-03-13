@@ -7,7 +7,6 @@ app = Flask(__name__)
 # In-memory todo storage
 todos = {}
 
-
 @app.route("/")
 def index():
     filter_status = request.args.get("filter", "all")
@@ -37,7 +36,6 @@ def index():
         search_query=request.args.get("q", ""),
     )
 
-
 @app.route("/add", methods=["POST"])
 def add_todo():
     title = request.form.get("title", "").strip()
@@ -50,19 +48,17 @@ def add_todo():
         }
     return redirect(url_for("index"))
 
-
 @app.route("/toggle/<todo_id>", methods=["POST"])
 def toggle_todo(todo_id):
     if todo_id in todos:
         todos[todo_id]["done"] = not todos[todo_id]["done"]
     return redirect(url_for("index"))
 
-
 @app.route("/delete/<todo_id>", methods=["POST"])
 def delete_todo(todo_id):
-    # TODO: implement delete
+    if todo_id in todos:
+        del todos[todo_id]
     return redirect(url_for("index"))
-
 
 @app.route("/api/todos")
 def api_todos():
@@ -70,7 +66,6 @@ def api_todos():
     for tid, todo in todos.items():
         result.append({"id": tid, **todo})
     return jsonify(result)
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
