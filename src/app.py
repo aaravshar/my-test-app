@@ -60,7 +60,8 @@ def toggle_todo(todo_id):
 
 @app.route("/delete/<todo_id>", methods=["POST"])
 def delete_todo(todo_id):
-    # TODO: implement delete
+    if todo_id in todos:
+        del todos[todo_id]  # Implement delete logic
     return redirect(url_for("index"))
 
 
