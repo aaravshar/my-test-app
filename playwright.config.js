@@ -18,18 +18,20 @@ module.exports = defineConfig({
     command: 'docker-compose -f src/docker-compose.yml up',
     url: 'http://localhost:5000/',
     reuseExistingServer: false,
-    timeout: 120000,  // Increase if necessary
+    timeout: 120000,
   },
   metadata: {
     task: {
       test_case_config: {
-        exampleSetting: true,            // Example settings for test case configuration
-        timeoutMultiplier: 2,            // Adjusts the global timeout for tests
-        retryStrategy: 'on-failure',     // Retry tests on failure
-        allowedFailure: false,           // Disallow some tests to fail without affecting overall success
-        logLevel: 'info',                // Log verbosity level
-        additionalConfig: 'specific-value' // Additional custom configuration field
+        exampleSetting: true,             // Example setting
+        timeoutMultiplier: 2,             // Adjusts the global timeout
+        retryStrategy: 'on-failure',      // Retry tests on failure
+        allowedFailure: false,            // Disallow tests to fail without affecting success
+        logLevel: 'info',                 // Log verbosity level
+        additionalConfig: 'specific-value'// Custom configuration field
+        // Ensure all necessary fields are included and configured correctly
       },
     },
   },
 });
+```
