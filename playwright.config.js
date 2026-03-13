@@ -23,9 +23,11 @@ module.exports = defineConfig({
   metadata: {
     task: {
       test_case_config: {
-        // Define required fields or necessary configuration here
-        // This is a placeholder and needs to be defined as per your application needs
+        exampleSetting: true,        // Example: determines if a feature is enabled
+        timeoutMultiplier: 2,        // Example: adjusts the global timeout settings
+        additionalConfig: 'value',   // Another example setting for customization
       }
     }
   }
 });
+```
