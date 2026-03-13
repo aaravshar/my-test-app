@@ -246,3 +246,105 @@ if __name__ == "__main__":
 - **IAM Role Permissions:** Make sure that the IAM role being used has the necessary permissions to perform operations on the DynamoDB table.
 
 These modifications will help handle potential issues related to DynamoDB interactions and provide more robust error reporting and handling mechanisms.
+
+## Turn 19
+
+To address the feedback related to the `ResourceNotFoundException`, it seems that there might be an issue with your `dynamodb_operations.py` file that was potentially omitted from the provided input. However, based on your error feedback, I suspect you're trying to interact with an AWS DynamoDB table that might not exist or is not correctly referenced in your code. Here’s a hypothetical solution involving DynamoDB operations:
+
+**Step 1**: Ensure you have the correct table name and AWS configuration.
+
+- Check your AWS credentials and region configuration in `~/.aws/credentials` and `~/.aws/config`, or through environment variables.
+
+**Step 2**: Verify the table exists and is correctly referenced in your code.
+
+Assuming you have code for DynamoDB operations in `dynamodb_operations.py`, here is a basic template for how it should look. If you don't already have this file, you might need to create it:
+
+```python
+# src/dynamodb_operations.py
+import boto3
+from botocore.exceptions import ClientError
+
+def get_dynamodb_client():
+    return boto3.client('dynamodb')
+
+def fetch_item(table_name, key):
+    dynamodb = get_dynamodb_client()
+    try:
+        response = dynamodb.get_item(
+            TableName=table_name,
+            Key=key
+        )
+        return response.get('Item', None)
+    except dynamodb.exceptions.ResourceNotFoundException:
+        print(f"Error: Table {table_name} not found.")
+    except ClientError as e:
+        print(f"Unexpected error: {e.response['Error']['Message']}")
+
+def add_item_to_table(table_name, item):
+    dynamodb = get_dynamodb_client()
+    try:
+        dynamodb.put_item(
+            TableName=table_name,
+            Item=item
+        )
+        print(f"Item {item} added to {table_name}.")
+    except dynamodb.exceptions.ResourceNotFoundException:
+        print(f"Error: Table {table_name} not found.")
+    except ClientError as e:
+        print(f"Unexpected error: {e.response['Error']['Message']}")
+```
+
+**Step 3**: Update your existing code to use these methods, ensuring you are passing the correct table name and item keys.
+
+Make sure to update other parts of your code to use these functions with the correct table names and data schema.
+
+Here's how you could modify the example Flask app to include interactions with DynamoDB. Replace `<Your-Table-Name>` with your actual DynamoDB table name and adjust the key and attributes according to your table’s schema.
+
+```python
+# Updated app.py
+
+# Example addition of a todo fetching feature from DynamoDB
+from flask import Flask, jsonify
+from your_project.dynamodb_operations import fetch_item, add_item_to_table
+
+app = Flask(__name__)
+TABLE_NAME = "<Your-Table-Name>"
+
+@app.route("/api/todo/<todo_id>")
+def api_get_todo(todo_id):
+    key = {'id': {'S': todo_id}}
+    item = fetch_item(TABLE_NAME, key)
+    if item:
+        response = {
+            "id": item['id']['S'],
+            "title": item['title']['S'],
+            "done": item['done']['BOOL'],
+            # Add any other fields you have in your table
+        }
+        return jsonify(response)
+    else:
+        return jsonify({"error": "Todo not found"}), 404
+
+@app.route("/api/add_todo", methods=["POST"])
+def api_add_todo():
+    title = request.json.get("title", "").strip()
+    if title:
+        todo_id = str(uuid.uuid4())
+        item = {
+            'id': {'S': todo_id},
+            'title': {'S': title},
+            'done': {'BOOL': False}
+        }
+        add_item_to_table(TABLE_NAME, item)
+        return jsonify({"message": "Todo added", "id": todo_id}), 201
+    return jsonify({"error": "Title is required"}), 400
+```
+
+This solution assumes familiarity with Flask and AWS DynamoDB. Make sure all dependencies such as `boto3` are listed in `requirements.txt`:
+
+```plaintext
+flask==2.3.2
+boto3==1.28.8
+```
+
+Remember, you need AWS credentials with permissions to interact with DynamoDB for this code to work. Adjust the above solutions depending on your exact implementation details.
