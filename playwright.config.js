@@ -23,11 +23,11 @@ module.exports = defineConfig({
   metadata: {
     task: {
       test_case_config: {
-        exampleSetting: true,            // Enables or disables a specific feature
+        exampleSetting: true,            // Example settings for test case configuration
         timeoutMultiplier: 2,            // Adjusts the global timeout for tests
-        retryStrategy: 'on-failure',     // Implements retry strategy on test failures
-        allowedFailure: false,           // Determines if some tests can fail without impacting overall success
-        logLevel: 'info',                // Sets the verbosity level of logs
+        retryStrategy: 'on-failure',     // Retry tests on failure
+        allowedFailure: false,           // Disallow some tests to fail without affecting overall success
+        logLevel: 'info',                // Log verbosity level
         additionalConfig: 'specific-value' // Additional custom configuration field
       },
     },
