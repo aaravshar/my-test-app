@@ -194,3 +194,38 @@ Here is a summarized version of what is already in your `MERGE_NOTES.md`, which 
 
 ### Conclusion
 As no other changes or adjustments were specified, and you’ve confirmed the readiness for merge, you should proceed with the outlined steps. If further assistance or actions are needed, feel free to specify any additional aspects you want addressed before the merge is conducted. If no adjustments are necessary, proceed with confidence using the `MERGE_NOTES.md` instructions.
+
+## Turn 21
+
+To address the feedback and proceed with merging, you can follow the steps outlined in the `MERGE_NOTES.md` file. Since the feedback you received is positive ("Looks good, please proceed with merging"), no code changes are required. Instead, the next steps involve completing the merge process as per the instructions. Here's a recap of what you'll do:
+
+1. **Commit Changes**: Ensure that all local changes are committed to your local branch.
+
+2. **Push Branch**: Push your feature branch to the remote repository:
+   ```bash
+   git push origin your-feature-branch
+   ```
+
+3. **Sync and Resolve Conflicts**: Fetch the latest changes from the main branch, rebase or merge them into your feature branch, and resolve any conflicts if they exist:
+   ```bash
+   git checkout your-feature-branch
+   git pull origin main
+   ```
+
+4. **Run Tests**: Ensure that all tests pass to verify the stability of your changes:
+   ```bash
+   npm install
+   npm test
+   ```
+
+5. **Finalize Merge**: Once tests pass, merge your feature branch into the main branch:
+   ```bash
+   git checkout main
+   git pull origin main
+   git merge your-feature-branch
+   git push origin main
+   ```
+
+6. **Confirmation**: Check the `main` branch on your remote repository to ensure the merge was successful and that CI tests pass.
+
+By following these steps, you can successfully finalize the merge process. Make sure also to verify URLs in `playwright.config.js` and review configurations post-merge to ensure everything is set up correctly.
