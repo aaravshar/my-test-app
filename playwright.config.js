@@ -20,4 +20,12 @@ module.exports = defineConfig({
     reuseExistingServer: false,
     timeout: 120000, // Increase if necessary
   },
+  metadata: {
+    task: {
+      test_case_config: {
+        // Define required fields or necessary configuration here
+        // This is a placeholder and needs to be defined as per your application needs
+      }
+    }
+  }
 });
