@@ -1,3 +1,4 @@
+```python
 import boto3
 from botocore.exceptions import ClientError
 
@@ -6,6 +7,40 @@ def initialize_dynamodb_client(region_name='us-west-2'):
     Initializes and returns a DynamoDB client with the specified region.
     """
     return boto3.resource('dynamodb', region_name=region_name)
+
+def create_dynamodb_table(table_name, dynamodb_client=None):
+    """
+    Creates a DynamoDB table with a primary key 'id' if it does not exist.
+    """
+    if dynamodb_client is None:
+        dynamodb_client = initialize_dynamodb_client()
+
+    try:
+        table = dynamodb_client.create_table(
+            TableName=table_name,
+            KeySchema=[
+                {
+                    'AttributeName': 'id',
+                    'KeyType': 'HASH'  # Partition key
+                },
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'id',
+                    'AttributeType': 'S'
+                },
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 5,
+                'WriteCapacityUnits': 5
+            }
+        )
+
+        table.meta.client.get_waiter('table_exists').wait(TableName=table_name)
+        print(f"Table {table_name} created successfully.")
+
+    except dynamodb_client.meta.client.exceptions.ResourceInUseException:
+        print(f"Table {table_name} already exists.")
 
 def get_item_from_dynamodb(table_name, key, dynamodb_client=None):
     """
@@ -22,6 +57,10 @@ def get_item_from_dynamodb(table_name, key, dynamodb_client=None):
             dynamodb_client = initialize_dynamodb_client()
 
         table = dynamodb_client.Table(table_name)
+
+        # Ensure the table exists
+        create_dynamodb_table(table_name, dynamodb_client)
+
         response = table.get_item(Key=key)
 
         if 'Item' in response:
@@ -47,3 +86,4 @@ if __name__ == "__main__":
         print("Item retrieved:", item)
     else:
         print("Failed to retrieve item.")
+```
