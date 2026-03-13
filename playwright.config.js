@@ -23,14 +23,13 @@ module.exports = defineConfig({
   metadata: {
     task: {
       test_case_config: {
-        exampleSetting: true,            // Example: Determines if a feature is enabled
-        timeoutMultiplier: 2,            // Example: Adjusts the global timeout settings
-        retryStrategy: 'on-failure',     // New field: Over-riding global retries or particular strategy
-        allowedFailure: false,           // New field: Allows certain test cases to fail without affecting others
-        logLevel: 'info',                // New field: Controls verbosity of logs, can be 'info', 'debug', 'warn'
-        additionalConfig: 'specific-value' // Customize this field as necessary
+        exampleSetting: true,            // Enables or disables a specific feature
+        timeoutMultiplier: 2,            // Adjusts the global timeout for tests
+        retryStrategy: 'on-failure',     // Implements retry strategy on test failures
+        allowedFailure: false,           // Determines if some tests can fail without impacting overall success
+        logLevel: 'info',                // Sets the verbosity level of logs
+        additionalConfig: 'specific-value' // Additional custom configuration field
       },
     },
   },
 });
-```
