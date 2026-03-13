@@ -66,3 +66,93 @@ if __name__ == "__main__":
 This mock function is set to interact with a DynamoDB table to get an item by the key and provides a pathway for error handling, specifically addressing the `ResourceNotFoundException`.
 
 When deploying, ensure your AWS credentials and region are properly set, and you have permission to access the specified table. The above snippet is hypothetical and focuses on AWS interaction that you may find helpful if eventually targeting AWS API calls, not the current provided Flask app directly. If this approach doesn't apply, please indicate what area is related to your issue for a more targeted response.
+
+## Turn 11
+
+To address the `ResourceNotFoundException` error in the context of a DynamoDB integration, we need to ensure the DynamoDB table is correctly set up and accessible. Here's a comprehensive guide with changes to address the feedback:
+
+### Changes Made:
+
+1. **Enhanced Error Handling in `dynamodb_operations.py`:** Improved log messages and set up a more structured format to handle exceptions, specifically for DynamoDB connection and query issues.
+
+2. **Configured AWS SDK:**
+   - Added `boto3` in `requirements.txt` for AWS SDK access.
+   - Provided placeholders for AWS configuration setup in `dynamodb_operations.py`.
+
+3. **Updated `dynamodb_operations.py`:** Ensured all operations with DynamoDB handle potential errors gracefully.
+
+### Modified Files:
+
+#### `requirements.txt`
+Add `boto3` for Amazon Web Services SDK support.
+
+```plaintext
+flask==2.3.2
+boto3==1.24.0
+```
+
+#### `dynamodb_operations.py`
+Improve error handling and enhance initialization with AWS credentials (potentially using environment variables or some secure storage).
+
+```python
+import boto3
+from botocore.exceptions import ClientError
+
+def initialize_dynamodb_client(region_name='us-west-2'):
+    """
+    Initializes and returns a DynamoDB client with the specified region.
+    """
+    # Consider setting credentials via environment variables for security
+    return boto3.resource('dynamodb', region_name=region_name)
+
+def get_item_from_dynamodb(table_name, key, dynamodb_client=None):
+    """
+    Retrieves an item from the specified DynamoDB table.
+    """
+    try:
+        if dynamodb_client is None:
+            dynamodb_client = initialize_dynamodb_client()
+
+        table = dynamodb_client.Table(table_name)
+        response = table.get_item(Key=key)
+
+        if 'Item' in response:
+            return response['Item']
+        else:
+            print(f"No item found for key: {key}")
+            return None
+
+    except ClientError as e:
+        error_code = e.response['Error']['Code']
+        if error_code == 'ResourceNotFoundException':
+            print(f"Error: Requested DynamoDB table '{table_name}' not found.")
+        elif error_code == 'ValidationException':
+            print(f"Validation error with key: {key}. Check if key structure is correct.")
+        else:
+            print(f"Unexpected error: {e}")
+        return None
+
+# Example usage
+if __name__ == "__main__":
+    # Example AWS configuration - use AWS IAM roles or environment variables
+    table_name = "example_table"
+    key = {"id": "example_id"}
+
+    item = get_item_from_dynamodb(table_name, key)
+    if item:
+        print("Item retrieved:", item)
+    else:
+        print("Failed to retrieve item.")
+```
+
+### Additional Recommendations:
+
+- **Check Table Existence:** Ensure that the table `example_table` exists in your AWS account.
+
+- **Configuration Management:** Consider externalizing AWS credentials and other configurations using environment variables or a secrets manager to enhance security.
+
+- **Role Permissions:** Verify that the IAM role or user has sufficient permissions to access the DynamoDB table.
+
+- **Region Configuration:** Check the region in which the DynamoDB table is created matches the `region_name` configured in the DynamoDB client setup.
+
+This setup should help to track down and handle `ResourceNotFoundException` effectively while interacting with DynamoDB in the Python script provided.
