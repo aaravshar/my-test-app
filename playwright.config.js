@@ -1,3 +1,4 @@
+```javascript
 // @ts-check
 const { defineConfig } = require('@playwright/test');
 
@@ -17,7 +18,7 @@ module.exports = defineConfig({
     command: 'docker-compose -f src/docker-compose.yml up',
     url: 'http://localhost:5000/',
     reuseExistingServer: false,
-    timeout: 120000,
+    timeout: 120000, // Increase if necessary
   },
   metadata: {
     task: {
@@ -29,3 +30,4 @@ module.exports = defineConfig({
     }
   }
 });
+```
