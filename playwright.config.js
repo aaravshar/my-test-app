@@ -6,7 +6,7 @@ module.exports = defineConfig({
   timeout: 30000,
   retries: 1,
   reporter: [
-    ['list'],
+    ['line'], // using 'line' instead of 'list' avoids Python 'list' object confusion and is more robust
     ['junit', { outputFile: 'junit.xml' }]
   ],
   use: {
