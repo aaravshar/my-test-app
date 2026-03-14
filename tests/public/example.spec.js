@@ -2,7 +2,19 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
 
-test('should load todos and display stats', async ({ page }) => {
+test.beforeEach(async ({ request }) => {
+  // Ensure clean state before each test to avoid test pollution & .items() misinterpretation
+  await request.get('/reset');
+});
+
+test('should load todos and display stats', async ({ page, request }) => {
+  // Verify reset worked: /api/todos should be empty
+  const resetCheck = await request.get('/api/todos');
+  expect(resetCheck.status()).toBe(200);
+  const initialData = await resetCheck.json();
+  expect(Array.isArray(initialData)).toBe(true);
+  expect(initialData.length).toBe(0);
+
   await page.goto('/');
 
   // Ensure no crash on stats — they're integers (not lists), so no .items() method
@@ -56,14 +68,30 @@ test('should load todos and display stats', async ({ page }) => {
   // Ensure no accidental stringified lists (e.g., "Total: [1,2,3]")
   expect(statsText, 'Stats should not contain bracketed lists').not.toMatch(/\[\s*\d+\s*,\s*\d+\s*\]/);
 });
-// 🔒 ADDITIONAL NOTE:
-// This test explicitly guards against the "list has no .items()" error by confirming:
-// - API responses are arrays → no `.items()`
-// - Stats are scalar integers → no `.items()`
-// - Any tooling parsing `junit.xml` should treat test metadata as scalars/lists, not dicts.
-// If you're seeing `.items() is not a function`, check:
-//   - custom reporters (e.g., in Jest/Playwright plugins)
-//   - CI scripts that parse XML/JSON outputs
-//   - post-test analysis scripts that assume "properties" are dicts
-// In Python: call `.items()` on dicts only. In JS: use `.entries()` on Maps or Object.entries() on plain objects.
+
+test('should add multiple todos independently', async ({ page, request }) => {
+  await request.get('/reset');
+
+  await page.goto('/');
+  await expect(page.getByTestId('stats')).toContainText('Total: 0');
+
+  await page.getByTestId('todo-input').fill('Todo 1');
+  await page.getByTestId('add-button').click();
+  await page.waitForSelector('.todo-item');
+
+  await page.getByTestId('todo-input').fill('Todo 2');
+  await page.getByTestId('add-button').click();
+  await page.waitForSelector('.todo-item:nth-child(2)');
+
+  // Confirm two items
+  await expect(page.getByTestId('todo-list')).toHaveCount(2);
+  await expect(page.getByTestId('stats')).toContainText('Total: 2');
+
+  // Verify /api/todos remains clean array (no .items())
+  const apiRes = await page.goto('/api/todos');
+  const resBody = await apiRes.json();
+  expect(Array.isArray(resBody), '/api/todos should still be a list').toBe(true);
+  expect(typeof resBody.items).toBe('undefined');
+  expect(resBody.length).toBe(2);
+});
 ```

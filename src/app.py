@@ -8,6 +8,14 @@ app = Flask(__name__)
 todos = {}
 
 
+@app.route("/reset", methods=["GET"])
+def reset():
+    """Reset todos to empty state — safe for testing only (no auth, not in prod)."""
+    global todos
+    todos = {}
+    return jsonify({"status": "ok", "message": "reset successful"})
+
+
 @app.route("/")
 def index():
     filter_status = request.args.get("filter", "all")
