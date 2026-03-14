@@ -8,6 +8,14 @@ app = Flask(__name__)
 todos = {}
 
 
+@app.route("/reset", methods=["GET"])
+def reset():
+    """Reset todos to empty state — safe for testing only (no auth, not in prod)."""
+    global todos
+    todos = {}
+    return jsonify({"status": "ok", "message": "reset successful"})
+
+
 @app.route("/")
 def index():
     filter_status = request.args.get("filter", "all")
@@ -60,7 +68,8 @@ def toggle_todo(todo_id):
 
 @app.route("/delete/<todo_id>", methods=["POST"])
 def delete_todo(todo_id):
-    # TODO: implement delete
+    if todo_id in todos:
+        del todos[todo_id]
     return redirect(url_for("index"))
 
 
