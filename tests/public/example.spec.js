@@ -25,26 +25,22 @@ test('should load todos and display stats', async ({ page }) => {
 
   const data = await response.json();
 
-  // ✅ CRITICAL SAFEGUARD:
-  // JSON from /api/todos is always a JavaScript *array* (not a dict).
-  // Arrays have `.length`, `.map()`, etc. — *not* `.items()` — which is a Python dict method.
-  // Calling `data.items()` would cause: "TypeError: data.items is not a function"
-  expect(Array.isArray(data), 'Expected /api/todos to return a JSON array (JS list)')
-    .toBe(true);
+  // ✅ SAFEGUARD: /api/todos returns a *JSON array* (JS Array, *not* Object)
+  // Arrays: use `.length`, `.map()`, `.filter()`, etc.
+  // Objects: use `.keys()`, `.values()`, `.entries()`, `.forEach()` (not `.items()` — Python-only!)
+  expect(Array.isArray(data), 'Expected /api/todos to return a JSON array (JS list)').toBe(true);
 
-  // Prevent "list has no .items()" bug by using `.length` instead
-  expect(data.length, 'Should match expected item count')
-    .toBe(1);
+  // Prevent "list has no .items()" bug: *never* call `.items()` on JS arrays!
+  // The following line demonstrates what NOT to do (would throw if uncommented):
+  // ❌ expect(() => { data.items() }).toThrow(); // "data.items is not a function"
+
+  expect(data.length, 'Should match expected item count').toBe(1);
 
   // Validate the first item
-  expect(data[0], 'First todo should match schema')
-    .toMatchObject({
-      id: expect.any(String),
-      title: 'Buy milk',
-      done: false,
-    });
-
-  // 🔒 NEVER use `.items()` (Python-only) on JS arrays!
-  // The following would fail immediately:
-  // ❌ expect(() => { data.items() }).toThrow(); // Uncommenting this demonstrates the correct behavior
+  expect(data[0], 'First todo should match schema').toMatchObject({
+    id: expect.any(String),
+    title: 'Buy milk',
+    done: false,
+  });
 });
+```
