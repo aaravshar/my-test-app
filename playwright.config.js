@@ -1,3 +1,4 @@
+```javascript
 // @ts-check
 const { defineConfig } = require('@playwright/test');
 
@@ -14,9 +15,10 @@ module.exports = defineConfig({
     headless: true,
   },
   webServer: {
-    command: 'echo "waiting for docker"',
+    command: 'docker-compose up --build -d',
     url: 'http://localhost:5000/',
-    reuseExistingServer: true,
-    timeout: 60000,
+    reuseExistingServer: false,
+    timeout: 120000,
   },
 });
+```
