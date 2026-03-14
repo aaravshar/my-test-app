@@ -17,19 +17,19 @@ def index():
     search_query = request.args.get("q", "").strip().lower()
 
     filtered = []
-    for tid, todo in sorted(todos.items(), key=lambda x: x[1]["created"], reverse=True):
-        if filter_status == "active" and todo["done"]:
+    for tid, todo in sorted(todos.items(), key=lambda x: x[1].get("created", 0), reverse=True):
+        if filter_status == "active" and todo.get("done"):
             continue
-        if filter_status == "completed" and not todo["done"]:
+        if filter_status == "completed" and not todo.get("done"):
             continue
-        if search_query and search_query not in todo["title"].lower():
+        if search_query and search_query not in todo.get("title", "").lower():
             continue
         filtered.append({"id": tid, **todo})
 
     stats = {
         "total": len(todos),
-        "active": sum(1 for t in todos.values() if not t["done"]),
-        "completed": sum(1 for t in todos.values() if t["done"]),
+        "active": sum(1 for t in todos.values() if not t.get("done")),
+        "completed": sum(1 for t in todos.values() if t.get("done")),
     }
 
     return render_template(
@@ -58,7 +58,7 @@ def add_todo():
 @app.route("/toggle/<todo_id>", methods=["POST"])
 def toggle_todo(todo_id):
     if todo_id in todos:
-        todos[todo_id]["done"] = not todos[todo_id]["done"]
+        todos[todo_id]["done"] = not todos[todo_id].get("done", False)
     logging.debug(f"Todos after toggling: {todos}")  # Debug print
     return redirect(url_for("index"))
 
