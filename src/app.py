@@ -1,4 +1,3 @@
-```python
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 import uuid
 import logging
@@ -10,10 +9,9 @@ todos = {}
 
 @app.route("/")
 def index():
+    logging.debug(f"Type of todos: {type(todos)}")  # Debug print
     filter_status = request.args.get("filter", "all")
     search_query = request.args.get("q", "").strip().lower()
-
-    # Removed the check and clear operation as todos is globally defined as a dictionary
 
     filtered = []
     for tid, todo in sorted(todos.items(), key=lambda x: x[1]["created"], reverse=True):
@@ -50,6 +48,7 @@ def add_todo():
             "done": False,
             "created": len(todos),
         }
+    logging.debug(f"Todos after addition: {todos}")  # Debug print
     return redirect(url_for("index"))
 
 
@@ -57,6 +56,7 @@ def add_todo():
 def toggle_todo(todo_id):
     if todo_id in todos:
         todos[todo_id]["done"] = not todos[todo_id]["done"]
+    logging.debug(f"Todos after toggling: {todos}")  # Debug print
     return redirect(url_for("index"))
 
 
@@ -64,11 +64,13 @@ def toggle_todo(todo_id):
 def delete_todo(todo_id):
     if todo_id in todos:
         del todos[todo_id]
+    logging.debug(f"Todos after deletion: {todos}")  # Debug print
     return redirect(url_for("index"))
 
 
 @app.route("/api/todos")
 def api_todos():
+    logging.debug(f"Type of todos in API: {type(todos)}")  # Debug print
     result = []
     for tid, todo in todos.items():
         result.append({"id": tid, **todo})
@@ -76,5 +78,4 @@ def api_todos():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=False)
-```
+    app.run(host="0.0.0.0", port=5000, debug=True)  # Set debug=True for better logging
