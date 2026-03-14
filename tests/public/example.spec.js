@@ -1,4 +1,3 @@
-```javascript
 // @ts-check
 const { test, expect } = require('@playwright/test');
 
@@ -24,10 +23,11 @@ test('should load todos and display stats', async ({ page }) => {
   expect(response.status()).toBe(200);
 
   const data = await response.json();
-  expect(Array.isArray(data)).toBe(true); // ✅ Ensure it's a list
+  // ✅ Critical: data is a JS array (list), NOT a dict — arrays have `.length`, not `.items()`  
+  //    (Python dicts have `.items()`, but this is JavaScript → JSON arrays stay as arrays)
+  expect(Array.isArray(data)).toBe(true);
   expect(data.length).toBe(1);
   expect(data[0]).toMatchObject({ id: expect.any(String), title: 'Buy milk', done: false });
 
-  // ⚠️ NEVER do: data.items() — arrays don’t have .items()
+  // 🔒 NEVER do: data.items() — will throw TypeError: data.items is not a function
 });
-```
