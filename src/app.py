@@ -11,6 +11,8 @@ todos = {}
 @app.route("/")
 def index():
     logging.debug(f"Type of todos: {type(todos)}")  # Debug print
+    if not isinstance(todos, dict):
+        todos = {}  # Reset todos to an empty dict if it's not a dict
     filter_status = request.args.get("filter", "all")
     search_query = request.args.get("q", "").strip().lower()
 
@@ -72,6 +74,8 @@ def delete_todo(todo_id):
 @app.route("/api/todos")
 def api_todos():
     logging.debug(f"Type of todos in API: {type(todos)}")  # Debug print
+    if not isinstance(todos, dict):
+        todos = {}  # Reset todos to an empty dict if it's not a dict
     result = []
     for tid, todo in todos.items():
         result.append({"id": tid, **todo})
