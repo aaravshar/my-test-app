@@ -1,3 +1,4 @@
+```javascript
 // @ts-check
 const { test, expect } = require('@playwright/test');
 
@@ -23,11 +24,27 @@ test('should load todos and display stats', async ({ page }) => {
   expect(response.status()).toBe(200);
 
   const data = await response.json();
-  // ✅ Critical: data is a JS array (list), NOT a dict — arrays have `.length`, not `.items()`  
-  //    (Python dicts have `.items()`, but this is JavaScript → JSON arrays stay as arrays)
-  expect(Array.isArray(data)).toBe(true);
-  expect(data.length).toBe(1);
-  expect(data[0]).toMatchObject({ id: expect.any(String), title: 'Buy milk', done: false });
 
-  // 🔒 NEVER do: data.items() — will throw TypeError: data.items is not a function
+  // ✅ CRITICAL SAFEGUARD:
+  // JSON from /api/todos is always a JavaScript *array* (not a dict).
+  // Arrays have `.length`, `.map()`, etc. — *not* `.items()` — which is a Python dict method.
+  // Calling `data.items()` would cause: "TypeError: data.items is not a function"
+  expect(Array.isArray(data), 'Expected /api/todos to return a JSON array (JS list)')
+    .toBe(true);
+
+  // Prevent "list has no .items()" bug by using `.length` instead
+  expect(data.length, 'Should match expected item count')
+    .toBe(1);
+
+  // Validate the first item
+  expect(data[0], 'First todo should match schema')
+    .toMatchObject({
+      id: expect.any(String),
+      title: 'Buy milk',
+      done: false,
+    });
+
+  // 🔒 NEVER use `.items()` (Python-only) on JS arrays!
+  // The following would fail immediately:
+  // ❌ expect(() => { data.items() }).toThrow(); // Uncommenting this demonstrates the correct behavior
 });
