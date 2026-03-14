@@ -7,7 +7,6 @@ app = Flask(__name__)
 # In-memory todo storage
 todos = {}
 
-
 @app.route("/")
 def index():
     filter_status = request.args.get("filter", "all")
