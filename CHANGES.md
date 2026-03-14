@@ -594,3 +594,61 @@ if __name__ == "__main__":
 After making these modifications, try running the Docker setup again and check the console logs for any errors during the application's startup. Also, ensure all services can start and stop without errors by using `docker-compose logs` and `docker-compose down/up` to see the results clearly.
 
 After confirming that the application initializes correctly and the health check passes, you can proceed with running the Playwright tests. This should help ensure that the build completes successfully and the test results are correctly uploaded.
+
+## Turn 27
+
+To address the feedback regarding the testing job's error and the missing test results in S3, we'll start by investigating the build setup, particularly focusing on the service startup process and test execution. There might be several reasons why the build failed before running tests:
+
+1. **Service Startup Issues:** Ensure the Docker services are running correctly before tests are executed.
+2. **Test Execution:** Ensure tests are correctly set up and can communicate with the service.
+3. **Logging and Debugging:** Add some logging to capture what happens before the failure to better understand the issue at hand.
+
+Here are the potential changes to improve the setup and ensure tests are executed:
+
+1. **Modify `docker-compose.yml`** to verify that the Docker service is up and running correctly. Also, ensure that there is proper logging to understand any failures in service startup.
+
+2. **Modify `playwright.config.js`** to include more detailed debugging information, if necessary, and possibly adjust the timeout settings to give services ample time to start.
+
+Here's how we can update the configuration:
+
+```yaml
+# src/docker-compose.yml
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+```
+
+```javascript
+// playwright.config.js
+const { defineConfig } = require('@playwright/test');
+
+module.exports = defineConfig({
+  testDir: './tests/public',
+  timeout: 60000,  // extended timeout to allow more time for tests to run
+  retries: 1,
+  reporter: [
+    ['list'],
+    ['junit', { outputFile: 'junit.xml' }]
+  ],
+  use: {
+    baseURL: 'http://localhost:5000',
+    headless: true,
+  },
+  webServer: {
+    command: 'docker-compose up --build -d',
+    url: 'http://localhost:5000/',
+    reuseExistingServer: false,
+    timeout: 180000,  // extended the timeout for the server to start
+  },
+});
+```
+
+In these changes, I have increased the timeout values to give more time for the server to start and for tests to complete, given network or performance delays. Additionally, logging options added to the `docker-compose.yml` are meant to keep concise records of service logs for debugging. 
+
+Please make sure all related services are functioning correctly, and the network allows communication between the test runner and the application server. With sufficient startup and execution time, we should see if the problem persists or if it resolves the current issues.
