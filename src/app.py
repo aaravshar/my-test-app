@@ -1,6 +1,7 @@
 ```python
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 import uuid
+import logging
 
 app = Flask(__name__)
 
@@ -11,6 +12,10 @@ todos = {}
 def index():
     filter_status = request.args.get("filter", "all")
     search_query = request.args.get("q", "").strip().lower()
+
+    if not isinstance(todos, dict):
+        logging.error("Todos is not a dictionary")
+        todos.clear()
 
     filtered = []
     for tid, todo in sorted(todos.items(), key=lambda x: x[1]["created"], reverse=True):
