@@ -1,37 +1,40 @@
 ```python
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 import uuid
+import logging
 
 app = Flask(__name__)
 
 # In-memory todo storage
 todos = {}
 
-
 @app.route("/")
 def index():
+    logging.debug(f"Type of todos: {type(todos)}")  # Debug print
+    if not isinstance(todos, dict):
+        todos = {}  # Reset todos to an empty dict if it's not a dict
     filter_status = request.args.get("filter", "all")
     search_query = request.args.get("q", "").strip().lower()
 
     filtered = []
-    for tid, todo in sorted(todos.items(), key=lambda x: x[1]["created"], reverse=True):
-        if filter_status == "active" and todo["done"]:
+    for tid, todo in sorted(todos.items(), key=lambda x: x[1].get("created", 0), reverse=True):
+        if filter_status == "active" and todo.get("done"):
             continue
-        if filter_status == "completed" and not todo["done"]:
+        if filter_status == "completed" and not todo.get("done"):
             continue
-        if search_query and search_query not in todo["title"].lower():
+        if search_query and search_query not in todo.get("title", "").lower():
             continue
         filtered.append({"id": tid, **todo})
 
     stats = {
         "total": len(todos),
-        "active": sum(1 for t in todos.values() if not t["done"]),
-        "completed": sum(1 for t in todos.values() if t["done"]),
+        "active": sum(1 for t in todos.values() if not t.get("done")),
+        "completed": sum(1 for t in todos.values() if t.get("done")),
     }
 
     return render_template(
         "index.html",
-        todos=filtered,
+        todos=filtered,  # Ensure this is a list of dictionaries
         stats=stats,
         current_filter=filter_status,
         search_query=request.args.get("q", ""),
@@ -48,24 +51,31 @@ def add_todo():
             "done": False,
             "created": len(todos),
         }
+    logging.debug(f"Todos after addition: {todos}")  # Debug print
     return redirect(url_for("index"))
 
 
 @app.route("/toggle/<todo_id>", methods=["POST"])
 def toggle_todo(todo_id):
     if todo_id in todos:
-        todos[todo_id]["done"] = not todos[todo_id]["done"]
+        todos[todo_id]["done"] = not todos[todo_id].get("done", False)
+    logging.debug(f"Todos after toggling: {todos}")  # Debug print
     return redirect(url_for("index"))
 
 
 @app.route("/delete/<todo_id>", methods=["POST"])
 def delete_todo(todo_id):
-    # TODO: implement delete
+    if todo_id in todos:
+        del todos[todo_id]
+    logging.debug(f"Todos after deletion: {todos}")  # Debug print
     return redirect(url_for("index"))
 
 
 @app.route("/api/todos")
 def api_todos():
+    logging.debug(f"Type of todos in API: {type(todos)}")  # Debug print
+    if not isinstance(todos, dict):
+        todos = {}  # Reset todos to an empty dict if it's not a dict
     result = []
     for tid, todo in todos.items():
         result.append({"id": tid, **todo})
@@ -73,5 +83,5 @@ def api_todos():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(host="0.0.0.0", port=5000, debug=True)  # Set debug=True for better logging
 ```
