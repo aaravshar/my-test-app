@@ -30,7 +30,7 @@ def index():
 
     return render_template(
         "index.html",
-        todos=filtered,
+        todos=filtered,  # Ensure this is a list of dictionaries
         stats=stats,
         current_filter=filter_status,
         search_query=request.args.get("q", ""),
