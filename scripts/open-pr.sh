@@ -3,69 +3,95 @@
 set -e
 
 # --- Configuration ---
-REPO_SLUG="${GITHUB_REPOSITORY:-}"
 BRANCH_NAME="feature/update-playwright-todo-app"
 TITLE="Update Playwright test suite for Flask Todo App"
-DESCRIPTION="This PR adds a robust Playwright test suite to validate the Flask Todo App, with safeguards against common .items() misinterpretation on JSON arrays."
+DESCRIPTION="This PR adds a robust Playwright test suite for the Flask Todo App, including safeguards against .items() misinterpretation on JSON arrays (ensuring /api/todos always returns a JS array, not a dict)."
 
 # Ensure we’re in a git repo
 if ! git rev-parse --git-dir > /dev/null 2>&1; then
-  echo "Error: Not a git repository."
-  exit 1
-fi
-
-# Save current branch
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-
-# Check if gh CLI is installed
-if ! command -v gh &> /dev/null; then
-  echo "❌ 'gh' CLI not found. Please install it first: https://cli.github.com/"
+  echo "❌ Error: Not a git repository."
   echo ""
   echo "To open a PR manually:"
   echo "  git checkout -b ${BRANCH_NAME}"
   echo "  git add ."
-  echo "  git commit -m 'feat: add Playwright tests (no .items() risks) and cleanup script'"
+  echo "  git commit -m 'feat: add Playwright tests (no .items() risks) and cleanup'"
   echo "  git push origin ${BRANCH_NAME}"
-  echo "  Then open a PR at GitHub UI."
   exit 1
 fi
 
-# Check if authenticated
-if ! gh auth status &> /dev/null; then
-  echo "❌ GitHub CLI not authenticated. Run: gh auth login"
-  exit 1
-fi
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+REPO_SLUG="${GITHUB_REPOSITORY:-}"
 
-# Sync main first (avoid stale PR)
-if [[ "$CURRENT_BRANCH" != "main" && "$CURRENT_BRANCH" != "master" ]]; then
-  echo "ℹ️ Switching to main/master to pull latest..."
-  git checkout main 2>/dev/null || git checkout master || true
-  git pull origin main || git pull origin master
-fi
+echo "ℹ️ Current branch: ${CURRENT_BRANCH}"
 
-# Create and push feature branch
-echo "ℹ️ Creating branch ${BRANCH_NAME}..."
+# Save state and restore at end
+cleanup() {
+  if [[ "$CURRENT_BRANCH" != "$BRANCH_NAME" ]]; then
+    echo "ℹ️ Returning to original branch: ${CURRENT_BRANCH}"
+    git checkout "$CURRENT_BRANCH" 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT
+
+# Sync main/master first
+echo "ℹ️ Syncing main/master to avoid stale PRs..."
+git fetch origin main 2>/dev/null || git fetch origin master || true
+MAIN_BRANCH=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null | sed 's|origin/||' || echo 'main')
+if [[ "$MAIN_BRANCH" != "main" && "$MAIN_BRANCH" != "master" ]]; then
+  MAIN_BRANCH="main"
+fi
+git checkout "$MAIN_BRANCH" 2>/dev/null || git checkout master 2>/dev/null || true
+git pull origin "$MAIN_BRANCH" || true
+
+# Create feature branch
+echo "ℹ️ Creating and checking out branch: ${BRANCH_NAME}"
 git checkout -b "$BRANCH_NAME"
 
-echo "ℹ️ Stage and commit all changes..."
+# Stage and commit
+echo "ℹ️ Staging all changes with 'git add .'"
 git add .
-git commit -m "feat: add Playwright test suite with array safety guards + cleanup" \
-  -m "- Safeguards verify /api/todos returns arrays (not dicts), preventing .items() misinterpretation" \
-  -m "- Includes reset,add,multiple todos tests; disables 'junit' to avoid XML parsing issues" \
-  -m "- Adds global-setup cleanup script to remove stale test artifacts"
 
-echo "ℹ️ Pushing ${BRANCH_NAME}..."
+# Check if there's anything to commit
+if ! git diff --cached --quiet; then
+  echo "ℹ️ Committing changes..."
+  git commit -m "feat: add Playwright tests (no .items() risks) and cleanup" \
+    -m "- Safeguards verify /api/todos returns arrays (not dicts), preventing .items() misinterpretation" \
+    -m "- Includes reset/add/multiple todos tests; disables 'junit' to avoid XML parsing issues" \
+    -m "- Adds global-setup cleanup script to remove stale test artifacts"
+else
+  echo "ℹ️ No staged changes to commit."
+fi
+
+# Push branch
+echo "ℹ️ Pushing branch with --force-with-lease (safe)"
 git push -u origin "$BRANCH_NAME" --force-with-lease
 
-# Create PR
-echo "ℹ️ Opening PR on GitHub..."
+# Check gh CLI and auth
+if ! command -v gh &>/dev/null; then
+  echo "❌ 'gh' CLI not installed. Skipping automatic PR."
+  echo ""
+  echo "To create a PR manually:"
+  echo "  git push -u origin ${BRANCH_NAME}"
+  echo "  Visit: https://github.com/${REPO_SLUG}/compare/${BRANCH_NAME}?expand=1"
+  exit 1
+fi
+
+if ! gh auth status &>/dev/null; then
+  echo "❌ Not authenticated with GitHub CLI."
+  echo "Run: gh auth login"
+  echo ""
+  echo "To create a PR manually after logging in:"
+  echo "  gh pr create --title '$TITLE' --body '$DESCRIPTION' --base $MAIN_BRANCH --head ${BRANCH_NAME}"
+  exit 1
+fi
+
+# Create PR *without* --fill (avoids auto-filling over custom title/body)
+echo "ℹ️ Creating PR with title and body..."
 gh pr create \
   --title "$TITLE" \
   --body "$DESCRIPTION" \
-  --base "main" \
-  --head "$BRANCH_NAME" \
-  --fill
+  --base "$MAIN_BRANCH" \
+  --head "$BRANCH_NAME"
 
 echo "✅ PR created successfully!"
-echo "🔗 You can view it at: https://github.com/${REPO_SLUG}/pull/new/${BRANCH_NAME}"
-```
+echo "🔗 View it at: https://github.com/${REPO_SLUG}/pull/new/${BRANCH_NAME}"
