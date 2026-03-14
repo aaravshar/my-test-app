@@ -537,3 +537,60 @@ Additionally, ensure the server-side logic in `app.py` is correctly handling mes
 - Adequately respond to all cases, including unexpected errors, to avoid causing client-side errors that could lead to the feedback mentioned.
 
 The above code refines input and response handling in the test to improve reliability. If the error arises from a logic issue elsewhere, we should ensure that other parts of the system (server-side) are consistent with starting with a user message and handle these accordingly as depicted in the `start_conversation` method in `app.py`.
+
+## Turn 25
+
+Based on the feedback, it looks like the build may have failed before the tests could run, which can happen if there are issues with the Docker setup or the web server initialization. Here's how we can address these problems:
+
+1. **Check Docker and Flask Setup**: Make sure that Docker is correctly set up, and that Flask app in `app.py` starts correctly. You should check the logs from the Docker container to see if there are any errors during startup.
+
+2. **Ensure Proper Port Binding**: Verify that the port `5000` is properly bound and not being used by other services.
+
+3. **Playwright Configuration**: Ensure that the `playwright.config.js` settings match the actual app settings.
+
+4. **Logs and Error Handling**: Add appropriate error logging to diagnose any issues causing the server to fail.
+
+5. **Testing Symlink Issue**: Double-check when testing, no symlinks or path resolution issues arise (ensure that the path in the `docker-compose.yml` and `playwright.config.js` are correct).
+
+I will update the `Dockerfile` to include logging and make sure that the Flask app starts in a way that makes errors more visible during initialization.
+
+Here's what I propose as changes:
+
+### Updated `Dockerfile`
+
+Adding logging and a guard for serving the application:
+
+```dockerfile
+# Dockerfile
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# Adding healthcheck to ensure Flask app readiness
+HEALTHCHECK --interval=5s --timeout=5s --retries=3 CMD curl --fail http://localhost:5000 || exit 1
+
+EXPOSE 5000
+
+# Use 'python -m' to ensure the main module is found
+CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=5000"]
+```
+
+### Logging Enhancement for Flask
+
+Enable debugging in development or logging for any server issues:
+
+```python
+# app.py
+if __name__ == "__main__":
+    # Enabling debug mode for better error output
+    app.run(host="0.0.0.0", port=5000, debug=True)
+```
+
+After making these modifications, try running the Docker setup again and check the console logs for any errors during the application's startup. Also, ensure all services can start and stop without errors by using `docker-compose logs` and `docker-compose down/up` to see the results clearly.
+
+After confirming that the application initializes correctly and the health check passes, you can proceed with running the Playwright tests. This should help ensure that the build completes successfully and the test results are correctly uploaded.
