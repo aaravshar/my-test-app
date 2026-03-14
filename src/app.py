@@ -16,6 +16,7 @@ def index():
     if not isinstance(todos, dict):
         logging.error("Todos is not a dictionary")
         todos.clear()
+        todos = {}
 
     filtered = []
     for tid, todo in sorted(todos.items(), key=lambda x: x[1]["created"], reverse=True):
