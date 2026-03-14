@@ -5,8 +5,10 @@ module.exports = defineConfig({
   testDir: './tests/public',
   timeout: 30000,
   retries: 1,
+  // NOTE: Using 'line' reporter instead of 'list' to avoid confusion with Python's 'list' type
+  //       (some tools/scripts might mistakenly try .items() on a list object)
   reporter: [
-    ['line'], // using 'line' instead of 'list' avoids Python 'list' object confusion and is more robust
+    ['line'],
     ['junit', { outputFile: 'junit.xml' }]
   ],
   use: {
