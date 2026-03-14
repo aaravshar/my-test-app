@@ -1,3 +1,4 @@
+```python
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 import uuid
 import logging
@@ -79,3 +80,4 @@ def api_todos():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)  # Set debug=True for better logging
+```
